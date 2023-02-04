@@ -2,22 +2,28 @@ package de.bsi.openai;
 
 import static org.junit.Assert.*;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpResponse;
+import java.util.Properties;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite.SuiteClasses;
 import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.config.PropertyPlaceholderConfigurer;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.stereotype.Component;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestPropertySource;
@@ -27,26 +33,31 @@ import org.springframework.test.util.ReflectionTestUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import de.bsi.openai.chatgpt.CompletionRequest;
+import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
+import org.springframework.context.annotation.PropertySource;
+import org.springframework.core.io.ClassPathResource;
 
-@ActiveProfiles("test")
+
 public class OpenAiApiClientTest {
 	
-	@InjectMocks
+	@Autowired
 	OpenAiApiClient openAiAPIClient;
 	
 	@Value("${openai.api_url}")
-	private URI openaiApiUrlTest;
+	private URI openaiApiUrlTest = URI.create("https://api.openai.com/v1/completions");
 	
 	@Value("${openai.api_key}")
-	private String openaiApiKeyTest;
-	
+	private String openaiApiKeyTest = "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";
+	 
 	@Before
 	public void setUp() throws Exception {
 		openAiAPIClient = new OpenAiApiClient();
-		System.out.println("******dddddddddddd**** :  "+openaiApiKeyTest);
 		ReflectionTestUtils.setField(openAiAPIClient, "openaiApiUrl", openaiApiUrlTest);
 		ReflectionTestUtils.setField(openAiAPIClient, "openaiApiKey", openaiApiKeyTest);
-
 	}
 
 	@After
@@ -60,17 +71,9 @@ public class OpenAiApiClientTest {
 		try {
 			String message = "Hello?";
 			var completion = CompletionRequest.defaultWith(message);
-			System.out.println("*****************");
-			System.out.println(completion);
 			ObjectMapper mapper = new ObjectMapper();
 			var postBodyJson = mapper.writeValueAsString(completion);
-			//var postBodyJson = jsonMapper.writeValueAsString(completion);
-			System.out.println("+++++++++++++++++");
-			System.out.println(postBodyJson);
 			result = openAiAPIClient.postToOpenAiApi(postBodyJson);
-			System.out.println("-------------------");
-			//System.out.println(result);
-			
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
