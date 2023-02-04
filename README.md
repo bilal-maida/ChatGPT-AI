@@ -19,6 +19,7 @@ This project is a web application that using the ChatGPT OpenAI API to ask any q
 - ChatGPT OpenAI API
 - Docker
 - GitHub
+- Jenkins
 
 ## Conclusion
 This project demonstrates the integration of various technologies to build a web application that utilizes the ChatGPT OpenAI API. The use of Docker and GitHub makes it easy to deploy and manage the application.
